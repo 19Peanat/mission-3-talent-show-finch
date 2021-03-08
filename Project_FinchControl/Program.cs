@@ -15,7 +15,7 @@ namespace Project_FinchControl
     // Application Type: Console
     // Author: Pearl, Natham
     // Dated Created: 2/16/2021
-    // Last Modified: 3/07/2021
+    // Last Modified: 2/29/2021
     //
     // **************************************************
 
@@ -516,7 +516,7 @@ namespace Project_FinchControl
         }
 
         /// <summary>
-        /// use the values that the user has given the program as well as te finch to give the vales of temp and place them in a graph.
+        /// use the values that the user has given the program as well as the finch to give the vales of temp and place them in a graph.
         /// </summary>
         /// <param name="temperatures"></param>
         static void DataRecorderDisplayTable(double[] temperatures)
@@ -598,6 +598,8 @@ namespace Project_FinchControl
 
 
             // validate user imput
+            //
+            //
             do
             {
                 validResponse = double.TryParse(Console.ReadLine(), out dataPointFrequency);
