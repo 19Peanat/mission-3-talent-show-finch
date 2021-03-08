@@ -109,7 +109,7 @@ namespace Project_FinchControl
                         break;
 
                     case "c":
-                        
+                        DisplayDataRecorderMenu(finchRobot);
                         break;
 
                     case "d":
@@ -411,7 +411,245 @@ namespace Project_FinchControl
 
         #endregion
 
-      
+
+
+
+        #region Data Recorder
+
+        /// <summary>
+        /// *****************************************************************
+        /// *                     Data Recorder Menu                        *
+        /// *****************************************************************
+        /// </summary>
+        /// 
+
+
+        static void DisplayDataRecorderMenu(Finch myfinch)
+        {
+            Console.CursorVisible = true;
+
+            bool quitDataRecorderMenu = false;
+            string menuChoice;
+            int numberOfDataPoints = 0;
+            double dataPointFrequency = 0;
+            double[] temperatures = null;
+
+
+            do
+            {
+                DisplayScreenHeader("Data Recorder Menu");
+
+                //
+                // get user menu choice
+                //
+                Console.WriteLine("\ta) Number of Data Points");
+                Console.WriteLine("\tb) Frequency of Data Points");
+                Console.WriteLine("\tc) Get Data");
+                Console.WriteLine("\td) Show Data");
+                Console.WriteLine("\tq) Main Menu");
+                Console.Write("\t\tEnter Choice:");
+                menuChoice = Console.ReadLine().ToLower();
+
+                //
+                // process user menu choice
+                //
+                switch (menuChoice)
+                {
+                    case "a":
+                        numberOfDataPoints = DataRecorderDisplayNumberOfDataPoints();
+                        break;
+
+                    case "b":
+                        dataPointFrequency = DataRecorderDisplayGEtDataPointFrequency();
+                        break;
+
+                    case "c":
+                        temperatures = DataRecorderDisplayGetData(numberOfDataPoints, dataPointFrequency, myfinch);
+                        break;
+
+                    case "d":
+                        DataRecorderDisplayShowData(temperatures);
+                        break;
+
+                    case "q":
+                        quitDataRecorderMenu = true;
+                        break;
+
+                    default:
+                        Console.WriteLine();
+                        Console.WriteLine("\tPlease enter a letter for the menu choice.");
+                        DisplayContinuePrompt();
+                        break;
+                }
+
+            } while (!quitDataRecorderMenu);
+        }
+
+        /// <summary>
+        /// Show off the dat the finch has gathered
+        /// </summary>
+        /// <param name="temperatures"></param>
+        static void DataRecorderDisplayShowData(double[] temperatures)
+        {
+            DisplayScreenHeader("show Data");
+            // table headers
+            Console.WriteLine(
+                    "recording #".PadLeft(20) +
+                    "Temp".PadLeft(20)
+                    );
+            Console.WriteLine(
+                   "___________".PadLeft(20) +
+                   "____".PadLeft(20)
+                   );
+
+            //Display table Data
+            for (int index = 0; index < temperatures.Length; index++)
+            {
+                Console.WriteLine(
+                  (index + 1).ToString().PadLeft(20) +
+                   temperatures[index].ToString("n2").PadLeft(20)
+                  );
+
+            }
+
+            DisplayContinuePrompt();
+        }
+
+        /// <summary>
+        /// use the values that the user has given the program as well as te finch to give the vales of temp and place them in a graph.
+        /// </summary>
+        /// <param name="temperatures"></param>
+        static void DataRecorderDisplayTable(double[] temperatures)
+        {
+            // table headers
+            Console.WriteLine(
+                    "recording #".PadLeft(20) +
+                    "Temp".PadLeft(20)
+                    );
+            Console.WriteLine(
+                   "___________".PadLeft(20) +
+                   "____".PadLeft(20)
+                   );
+
+            //Display table Data
+            for (int index = 0; index < temperatures.Length; index++)
+            {
+                Console.WriteLine(
+                  (index + 1).ToString().PadLeft(20) +
+                   temperatures[index].ToString("n2").PadLeft(20)
+                  );
+
+            }
+
+        }
+
+        /// <summary>
+        /// useing the user respose to collect data fromt the finch robot on the user comandes
+        /// </summary>
+        /// <returns>Display Get data</returns>
+        static double[] DataRecorderDisplayGetData(int numberOfDataPoints, double dataPointFrequency, Finch myfinch)
+        {
+
+            double[] temperatures = new double[numberOfDataPoints];
+
+
+            DisplayScreenHeader("Get Data");
+
+            Console.WriteLine($"  \tNumber of Data Points: {numberOfDataPoints}");
+            Console.WriteLine($"  \tData Point Frequency: {dataPointFrequency}");
+            Console.WriteLine();
+            Console.WriteLine("I am ready to start recording you information. I mean temperatures.");
+            Console.WriteLine("Yes that is my job to record temperatures.");
+            DisplayContinuePrompt();
+            for (int index = 0; index < numberOfDataPoints; index++)
+            {
+                temperatures[index] = myfinch.getTemperature() * 9 / 5 + 32;
+                Console.WriteLine($"\tReading{index + 1}: {temperatures[index].ToString("n2")}");
+                int waitInSecounds = (int)(dataPointFrequency * 1000);
+                myfinch.wait(waitInSecounds);
+            }
+
+
+            Console.WriteLine();
+            Console.WriteLine("\tTable of Temperatures");
+            Console.WriteLine();
+            DataRecorderDisplayTable(temperatures);
+
+            DisplayContinuePrompt();
+
+            return temperatures;
+        }
+
+
+
+
+        /// <summary>
+        /// get the frequency of data points from the user
+        /// </summary>
+        /// <returns>frequency of data points</returns>
+        static double DataRecorderDisplayGEtDataPointFrequency()
+        {
+            double dataPointFrequency;
+            bool validResponse;
+
+            DisplayScreenHeader("Data point Frequency");
+            Console.WriteLine("Hi again what Frequency would you like this Project to be at.");
+            Console.WriteLine("Please enter a numerical Value Here:");
+
+
+            // validate user imput
+            do
+            {
+                validResponse = double.TryParse(Console.ReadLine(), out dataPointFrequency);
+                Console.WriteLine($"Did you say {dataPointFrequency}. Yes or No");
+                Console.ReadLine();
+                if (!validResponse)
+                {
+                    Console.WriteLine("Please Put in an interger:");
+                    DisplayContinuePrompt();
+                }
+            } while (validResponse);
+
+            DisplayContinuePrompt();
+
+            return dataPointFrequency;
+        }
+
+        /// <summary>
+        /// get the data points and display them as needed
+        /// </summary>
+        /// <returns>Display Data points</returns>
+        static int DataRecorderDisplayNumberOfDataPoints()
+        {
+            int numberOfDataPoints;
+            string userResponse;
+            bool validResponse;
+            do
+            {
+                DisplayScreenHeader("Number of Data Points");
+                Console.WriteLine("Hello How many data points would you like to use for this Project.");
+                userResponse = Console.ReadLine();
+
+                // validate user imput
+                validResponse = int.TryParse(userResponse, out numberOfDataPoints);
+                Console.WriteLine($"Total Number of Data Points: {numberOfDataPoints}");
+                if (!validResponse)
+                {
+                    Console.WriteLine("Please Put in an interger:");
+                    DisplayContinuePrompt();
+                }
+            } while (validResponse);
+
+            DisplayContinuePrompt();
+
+            return numberOfDataPoints;
+        }
+
+
+
+        #endregion
+
+
 
         #region User Programming
 
