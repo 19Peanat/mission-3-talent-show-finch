@@ -15,7 +15,7 @@ namespace Project_FinchControl
     // Application Type: Console
     // Author: Pearl, Natham
     // Dated Created: 2/16/2021
-    // Last Modified: 3/07/2021
+    // Last Modified: 3/21/2021
     //
     // **************************************************
 
@@ -1088,10 +1088,10 @@ namespace Project_FinchControl
                         ; break;
                     case Command.LEDON:
                         finchRobot.setLED(ledBrightness, ledBrightness, ledBrightness);
-                        finchRobot.wait(1000);
+                        finchRobot.wait(500);
                         finchRobot.setLED(ledBrightness, 0, ledBrightness);
-                        finchRobot.wait(1000);
-                        finchRobot.setLED(ledBrightness - 10, ledBrightness + 30, ledBrightness - 10);
+                        finchRobot.wait(500);
+                        finchRobot.setLED(ledBrightness - 20, ledBrightness + 30, ledBrightness - 20);
                         CommandFeedback = Command.LEDON.ToString();
                         ; break;
                     case Command.GETTEMPERATURE:
