@@ -50,7 +50,7 @@ namespace Project_FinchControl
         /// </summary>
         /// <param name="args"></param>
 
-        static void Main (string[] args)
+        static void Main(string[] args)
         {
             SetTheme();
 
@@ -69,7 +69,7 @@ namespace Project_FinchControl
         }
 
 
-   
+
 
 
         /// <summary>
@@ -94,6 +94,7 @@ namespace Project_FinchControl
                 Console.WriteLine("\td) Alarm System");
                 Console.WriteLine("\te) User Programming");
                 Console.WriteLine("\tf) Disconnect Finch Robot");
+                Console.WriteLine("\tL) Login / Register");
                 Console.WriteLine("\tq) Quit");
                 Console.Write("\t\tEnter Choice:");
                 menuChoice = Console.ReadLine().ToLower();
@@ -127,6 +128,9 @@ namespace Project_FinchControl
                     case "q":
                         DisplayDisconnectFinchRobot(finchRobot);
                         quitApplication = true;
+                        break;
+                    case "L":
+                        DisplayLogiRegisterMenuScreen();
                         break;
 
                     default:
@@ -1044,10 +1048,10 @@ namespace Project_FinchControl
         {
             int motorSpeed = comandParameters.motorSpeed;
             int ledBrightness = comandParameters.ledBrightness;
-            int waitMilliSecounds = (int) comandParameters.waitSecounds * 100;
+            int waitMilliSecounds = (int)comandParameters.waitSecounds * 100;
             string CommandFeedback = "";
             const int TURNING_MOTO_SPEED = 100;
-            
+
             DisplayScreenHeader("Executing Finch Commands:");
             Console.WriteLine("\tI'm Ready To Start Executing The List Commands:");
             DisplayContinuePrompt();
@@ -1244,6 +1248,249 @@ namespace Project_FinchControl
             Console.WriteLine();
         }
         #endregion
+
+        #region Login
+
+        /// <summary>
+        /// *****************************************************************
+        /// *                     Login Register                         *
+        /// *****************************************************************
+        /// </summary>
+        /// 
+
+
+        static void DisplayLogiRegisterMenuScreen()
+        {
+            Console.CursorVisible = true;
+
+            bool quitLoginRegisterMenu = false;
+            string menuChoice;
+
+            do
+            {
+                DisplayScreenHeader("Login / Register");
+
+                //
+                // get user menu choice
+                //
+                Console.WriteLine("\ta) ");
+                Console.WriteLine("\tb) ");
+                Console.WriteLine("\tc) ");
+                Console.WriteLine("\td) ");
+                Console.WriteLine("\tq) ");
+                Console.Write("\t\tEnter Choice:");
+                menuChoice = Console.ReadLine().ToLower();
+
+                //
+                // process user menu choice
+                //
+                switch (menuChoice)
+                {
+                    case "a":
+                        ;
+                        break;
+
+                    case "b":
+                        ;
+                        break;
+
+                    case "c":
+                        ;
+                        break;
+
+                    case "d":
+
+                        break;
+
+                    case "q":
+                        quitLoginRegisterMenu = true;
+                        break;
+
+                    default:
+                        Console.WriteLine();
+                        Console.WriteLine("\tPlease enter a letter for the menu choice.");
+                        DisplayContinuePrompt();
+                        break;
+                }
+
+            } while (!quitLoginRegisterMenu);
+        }
+
+
+        /// <summary>
+        /// *****************************************************************
+        /// *                 Login/Register Screen                         *
+        /// *****************************************************************
+        /// </summary>
+        static void DisplayLoginRegister()
+        {
+            DisplayScreenHeader("Login/Register");
+
+            Console.Write("\tAre you a registered user [ yes | no ]?");
+            if (Console.ReadLine().ToLower() == "yes")
+            {
+                DisplayLogin();
+            }
+            else
+            {
+                DisplayRegisterUser();
+                DisplayLogin();
+            }
+        }
+
+        /// <summary>
+        /// *****************************************************************
+        /// *                          Login Screen                         *
+        /// *****************************************************************
+        /// </summary>
+        static void DisplayLogin()
+        {
+            string userName;
+            string password;
+            bool validLogin;
+
+            do
+            {
+                DisplayScreenHeader("Login");
+
+                Console.WriteLine();
+                Console.Write("\tEnter your user name:");
+                userName = Console.ReadLine();
+                Console.Write("\tEnter your password:");
+                password = Console.ReadLine();
+
+                validLogin = IsValidLoginInfo(userName, password);
+
+                Console.WriteLine();
+                if (validLogin)
+                {
+                    Console.WriteLine("\tYou are now logged in.");
+                }
+                else
+                {
+                    Console.WriteLine("\tIt appears either the user name or password is incorrect.");
+                    Console.WriteLine("\tPlease try again.");
+                }
+
+                DisplayContinuePrompt();
+            } while (!validLogin);
+        }
+
+        /// <summary>
+        /// check user login
+        /// </summary>
+        /// <param name="userName">user name entered</param>
+        /// <param name="password">password entered</param>
+        /// <returns>true if valid user</returns>
+        static bool IsValidLoginInfo(string userName, string password)
+        {
+            List<(string userName, string password)> registeredUserLoginInfo = new List<(string userName, string password)>();
+            bool validUser = false;
+
+            registeredUserLoginInfo = ReadLoginInfoData();
+
+            //
+            // loop through the list of registered user login tuples and check each one against the login info
+            //
+            foreach ((string userName, string password) userLoginInfo in registeredUserLoginInfo)
+            {
+                if ((userLoginInfo.userName == userName) && (userLoginInfo.password == password))
+                {
+                    validUser = true;
+                    break;
+                }
+            }
+
+            return validUser;
+        }
+
+        /// <summary>
+        /// *****************************************************************
+        /// *                       Register Screen                         *
+        /// *****************************************************************
+        /// write login info to data file
+        /// </summary>
+        static void DisplayRegisterUser()
+        {
+            string userName;
+            string password;
+
+            DisplayScreenHeader("Register");
+
+            Console.Write("\tEnter your user name:");
+            userName = Console.ReadLine();
+            Console.Write("\tEnter your password:");
+            password = Console.ReadLine();
+
+            WriteLoginInfoData(userName, password);
+
+            Console.WriteLine();
+            Console.WriteLine("\tYou entered the following information and it has be saved.");
+            Console.WriteLine($"\tUser name: {userName}");
+            Console.WriteLine($"\tPassword: {password}");
+
+            DisplayContinuePrompt();
+        }
+
+        /// <summary>
+        /// read login info from data file
+        /// Note: no error or validation checking
+        /// </summary>
+        /// <returns>list of tuple of user name and password</returns>
+        static List<(string userName, string password)> ReadLoginInfoData()
+        {
+            string dataPath = @"Data/Logins.txt";
+
+            string[] loginInfoArray;
+            (string userName, string password) loginInfoTuple;
+
+            List<(string userName, string password)> registeredUserLoginInfo = new List<(string userName, string password)>();
+
+            loginInfoArray = File.ReadAllLines(dataPath);
+
+            //
+            // loop through the array
+            // split the user name and password into a tuple
+            // add the tuple to the list
+            //
+            foreach (string loginInfoText in loginInfoArray)
+            {
+                //
+                // use the Split method to separate the user name and password into an array
+                //
+                loginInfoArray = loginInfoText.Split(',');
+
+                loginInfoTuple.userName = loginInfoArray[0];
+                loginInfoTuple.password = loginInfoArray[1];
+
+                registeredUserLoginInfo.Add(loginInfoTuple);
+
+            }
+
+            return registeredUserLoginInfo;
+        }
+
+        /// <summary>
+        /// write login info to data file
+        /// Note: no error or validation checking
+        /// </summary>
+        static void WriteLoginInfoData(string userName, string password)
+        {
+            string dataPath = @"Data/Logins.txt";
+            string loginInfoText;
+
+            loginInfoText = userName + "," + password;
+
+            //
+            // use the AppendAllText method to not overwrite the existing logins
+            //
+            File.AppendAllText(dataPath, loginInfoText);
+        }
+
+
+        #endregion
+
     }
 }
+
 
